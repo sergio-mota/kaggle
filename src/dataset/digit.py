@@ -20,8 +20,10 @@ class DigitDataset(Dataset):
             try:
                 df = pd.read_csv(os.path.join(data_dir, "train.csv"))
 
-                self.features = torch.tensor(
-                    df.drop(columns=["label"]).values.astype("float32")
+                self.features = (
+                    torch.tensor(
+                        df.drop(columns=["label"]).values.astype("float32")
+                    ) / 255.0
                 ).reshape(-1, 1, 28, 28)
                 self.labels = torch.tensor(df["label"].values, dtype=torch.int64)
                 torch.save({"features": self.features, "labels": self.labels}, filepath)
@@ -86,7 +88,6 @@ class DigitDataModule(L.LightningDataModule):
             return
         
         transform = v2.Compose([
-            v2.ToDtype(torch.float32, scale=True),
             v2.Normalize((0.5,), (0.5,))
         ])
 
